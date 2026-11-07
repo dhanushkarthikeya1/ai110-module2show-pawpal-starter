@@ -1,71 +1,57 @@
 # PawPal+ Project Reflection
 
+> Review this AI-assisted draft and adjust any wording that does not match your own experience before submitting.
+
 ## 1. System Design
 
-**a. Initial design**
+### a. Initial design
 
-- Briefly describe your initial UML design.
-- What classes did you include, and what responsibilities did you assign to each?
+I modeled the app with four main classes. `Owner` manages pets and stores planning preferences. `Pet` owns its care tasks. `Task` stores a title, due date, preferred time, duration, priority, recurrence, and completion status. `Scheduler` gathers tasks from the owner, filters and orders them, checks preferred-time conflicts, and produces a daily plan. The UML diagram records these relationships in `diagrams/uml_final.mmd`.
 
-**b. Design changes**
+### b. Design changes
 
-- Did your design change during implementation?
-- If yes, describe at least one change and why you made it.
-
----
+The final design adds `DailyPlan` and `ScheduleEntry` result objects. This keeps the scheduling algorithm separate from how Streamlit displays the plan. The scheduler can return included tasks, skipped tasks, and warnings together, which makes its decisions easier to test and explain.
 
 ## 2. Scheduling Logic and Tradeoffs
 
-**a. Constraints and priorities**
+### a. Constraints and priorities
 
-- What constraints does your scheduler consider (for example: time, priority, preferences)?
-- How did you decide which constraints mattered most?
+The planner first limits candidates to incomplete tasks due on the selected date. It sorts by high, medium, then low priority, then uses the owner's optional task-title keywords, preferred time, duration, and title as tie-breakers. It starts at the owner's selected time and does not schedule past the available-minute limit. These rules give urgent tasks first access to limited time and keep results deterministic.
 
-**b. Tradeoffs**
+### b. Tradeoffs
 
-- Describe one tradeoff your scheduler makes.
-- Why is that tradeoff reasonable for this scenario?
-
----
+This is a greedy planner, not a global optimizer. It may schedule a high-priority long task before several shorter medium-priority tasks even when another combination would fit more work. That tradeoff keeps the behavior predictable and explainable for this small project. The conflict detector warns about overlapping preferred-time windows, while the generated plan shifts tasks into sequential slots. It does not model travel time, task dependencies, or multiple people caring for pets.
 
 ## 3. AI Collaboration
 
-**a. How you used AI**
+### a. How I used AI
 
-- How did you use AI tools during this project (for example: design brainstorming, debugging, refactoring)?
-- What kinds of prompts or questions were most helpful?
+I used ChatGPT in this coding session to help translate the assignment requirements into the class structure, scheduling rules, Streamlit integration, and a test plan. The most useful questions focused on how the scheduler should collect tasks from the owner's pets and how to handle recurrence and time-budget limits.
 
-**b. Judgment and verification**
+### b. Judgment and verification
 
-- Describe one moment where you did not accept an AI suggestion as-is.
-- How did you evaluate or verify what the AI suggested?
-
----
+I kept the scheduling policy deliberately small and explicit: priority first, then owner keyword preferences, preferred time, duration, and title. During verification, an early test draft assumed the word “no” would be removed as a stop word and that C01 would rank ahead of C07 for the grocery query. I did not change the code just to satisfy those assumptions: “no” is not in the stop-word set, and the actual BM25 scores put C07 first. I corrected the test expectations after checking the implementation and running the suite. A more elaborate scoring or optimization approach would add complexity without evidence that it improves this small example. The tests verify the documented rules; they do not prove the planner is suitable for every real household.
 
 ## 4. Testing and Verification
 
-**a. What you tested**
+### a. What I tested
 
-- What behaviors did you test?
-- Why were these tests important?
+The automated tests cover task status changes, adding tasks, date/time sorting, filtering by pet and completion state, daily and weekly recurrence, overlapping preferred-time windows, priority under a time limit, and duplicate pet names. These behaviors define the model's core promises and are likely places for regressions when the UI changes.
 
-**b. Confidence**
+### b. Confidence
 
-- How confident are you that your scheduler works correctly?
-- What edge cases would you test next if you had more time?
-
----
+The test suite gives me reasonable confidence in the tested rules. I would next add tests for a task ending exactly at the time-budget boundary, a task preferred before the selected start time, tasks on different dates, and multiple overlapping tasks with different durations.
 
 ## 5. Reflection
 
-**a. What went well**
+### a. What went well
 
-- What part of this project are you most satisfied with?
+Separating the data model and scheduling rules from the Streamlit interface made the core behavior testable without launching a browser. Returning explicit scheduled, skipped, and conflict results also made the planner easier to explain in the UI.
 
-**b. What you would improve**
+### b. What I would improve
 
-- If you had another iteration, what would you improve or redesign?
+I would add persistent storage so pets and tasks remain after a session ends, and add a clearer way to edit or delete existing tasks. A later version could compare the current greedy policy with a different scheduling strategy using defined test scenarios.
 
-**c. Key takeaway**
+### c. Key takeaway
 
-- What is one important thing you learned about designing systems or working with AI on this project?
+AI can help produce a working structure quickly, but the developer still needs to choose understandable rules and verify the implementation against concrete cases. Here, the important design decision was to make the scheduling policy visible and testable instead of hiding it inside the interface.
