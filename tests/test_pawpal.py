@@ -25,6 +25,13 @@ class PawPalTests(unittest.TestCase):
         self.mochi.add_task(Task("Feeding", 10, due_date=self.today))
         self.assertEqual(len(self.mochi.tasks), 1)
 
+    def test_pet_can_replace_a_task_with_an_edited_version(self):
+        original = Task("Walk", 20, due_date=self.today)
+        edited = Task("Long walk", 35, "high", due_date=self.today)
+        self.mochi.add_task(original)
+        self.mochi.update_task(original, edited)
+        self.assertEqual(self.mochi.tasks, [edited])
+
     def test_sorting_orders_by_date_then_preferred_time(self):
         later = Task("Evening", 10, due_date=self.today, preferred_time=time(18))
         earlier = Task("Morning", 10, due_date=self.today, preferred_time=time(8))

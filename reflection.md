@@ -36,7 +36,7 @@ I kept the scheduling policy deliberately small and explicit: priority first, th
 
 ### a. What I tested
 
-The automated tests cover task status changes, adding tasks, date/time sorting, filtering by pet and completion state, daily and weekly recurrence, overlapping preferred-time windows, priority under a time limit, and duplicate pet names. These behaviors define the model's core promises and are likely places for regressions when the UI changes.
+The automated tests cover task status changes, adding and editing tasks, date/time sorting, filtering by pet and completion state, daily and weekly recurrence, overlapping preferred-time windows, priority under a time limit, owner keyword preferences, and duplicate pet names. These behaviors define the model's core promises and are likely places for regressions when the UI changes.
 
 ### b. Confidence
 
@@ -50,7 +50,7 @@ Separating the data model and scheduling rules from the Streamlit interface made
 
 ### b. What I would improve
 
-I would add persistent storage so pets and tasks remain after a session ends, and add a clearer way to edit or delete existing tasks. A later version could compare the current greedy policy with a different scheduling strategy using defined test scenarios.
+I would add persistent storage so pets and tasks remain after a session ends, and add a way to delete existing tasks. A later version could compare the current greedy policy with a different scheduling strategy using defined test scenarios.
 
 ### c. Key takeaway
 

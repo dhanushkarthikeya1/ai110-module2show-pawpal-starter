@@ -60,6 +60,14 @@ class Pet:
         """Remove a task if it belongs to this pet."""
         self.tasks.remove(task)
 
+    def update_task(self, task: Task, replacement: Task) -> None:
+        """Replace one of this pet's tasks with an edited task."""
+        for index, existing in enumerate(self.tasks):
+            if existing is task:
+                self.tasks[index] = replacement
+                return
+        raise ValueError("The task does not belong to this pet.")
+
 
 @dataclass
 class Owner:
